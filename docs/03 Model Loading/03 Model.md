@@ -1,15 +1,15 @@
 # 模型
 
-原文     | [Model](http://learnopengl.com/#!Model-Loading/Model)
-      ---|---
-作者     | JoeyDeVries
-翻译     | Krasjet
-校对     | 暂未校对
+ 原文 | [Model](http://learnopengl.com/#!Model-Loading/Model) 
+ ---- | ----------------------------------------------------- 
+ 作者 | JoeyDeVries                                           
+ 翻译 | Krasjet                                               
+ 校对 | 暂未校对                                              
 
 现在是时候接触Assimp并创建实际的加载和转换代码了。这个教程的目标是创建另一个类来完整地表示一个模型，或者说是包含多个网格，甚至是多个物体的模型。一个包含木制阳台、塔楼、甚至游泳池的房子可能仍会被加载为一个模型。我们会使用Assimp来加载模型，并将它转换(Translate)至多个在[上一节](02 Mesh.md)中创建的<var>Mesh</var>对象。
 
 
-事不宜迟，我会先把<fun>Model</fun>类的结构给你：
+事不宜迟，我会先把`Model`类的结构给你：
 
 ```c++
 class Model 
@@ -34,9 +34,9 @@ class Model
 };
 ```
 
-<fun>Model</fun>类包含了一个<fun>Mesh</fun>对象的vector（译注：这里指的是C++中的vector模板类，之后遇到均不译），构造器需要我们给它一个文件路径。在构造器中，它会直接通过<fun>loadModel</fun>来加载文件。私有函数将会处理Assimp导入过程中的一部分，我们很快就会介绍它们。我们还将储存文件路径的目录，在之后加载纹理的时候还会用到它。
+`Model`类包含了一个`Mesh`对象的vector（译注：这里指的是C++中的vector模板类，之后遇到均不译），构造器需要我们给它一个文件路径。在构造器中，它会直接通过`loadModel`来加载文件。私有函数将会处理Assimp导入过程中的一部分，我们很快就会介绍它们。我们还将储存文件路径的目录，在之后加载纹理的时候还会用到它。
 
-<fun>Draw</fun>函数没有什么特别之处，基本上就是遍历了所有网格，并调用它们各自的<fun>Draw</fun>函数。
+`Draw`函数没有什么特别之处，基本上就是遍历了所有网格，并调用它们各自的`Draw`函数。
 
 ```c++
 void Draw(Shader shader)
@@ -56,7 +56,7 @@ void Draw(Shader shader)
 #include <assimp/postprocess.h>
 ```
 
-首先需要调用的函数是<fun>loadModel</fun>，它会从构造器中直接调用。在<fun>loadModel</fun>中，我们使用Assimp来加载模型至Assimp的一个叫做<u>scene</u>的数据结构中。你可能还记得在模型加载章节的[第一节](01 Assimp.md)教程中，这是Assimp数据接口的根对象。一旦我们有了这个场景对象，我们就能访问到加载后的模型中所有所需的数据了。
+首先需要调用的函数是`loadModel`，它会从构造器中直接调用。在`loadModel`中，我们使用Assimp来加载模型至Assimp的一个叫做<u>scene</u>的数据结构中。你可能还记得在模型加载章节的[第一节](01 Assimp.md)教程中，这是Assimp数据接口的根对象。一旦我们有了这个场景对象，我们就能访问到加载后的模型中所有所需的数据了。
 
 Assimp很棒的一点在于，它抽象掉了加载不同文件格式的所有技术细节，只需要一行代码就能完成所有的工作：
 
@@ -65,15 +65,15 @@ Assimp::Importer importer;
 const aiScene *scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
 ```
 
-我们首先声明了Assimp命名空间内的一个<fun>Importer</fun>，之后调用了它的<var>ReadFile</var>函数。这个函数需要一个文件路径，它的第二个参数是一些<def>后期处理</def>(Post-processing)的选项。除了加载文件之外，Assimp允许我们设定一些选项来强制它对导入的数据做一些额外的计算或操作。通过设定<var>aiProcess_Triangulate</var>，我们告诉Assimp，如果模型不是（全部）由三角形组成，它需要将模型所有的图元形状变换为三角形。<var>aiProcess_FlipUVs</var>将在处理的时候翻转y轴的纹理坐标（你可能还记得我们在[纹理](../01 Getting started/06 Textures.md)教程中说过，在OpenGL中大部分的图像的y轴都是反的，所以这个后期处理选项将会修复这个）。其它一些比较有用的选项有：
+我们首先声明了Assimp命名空间内的一个`Importer`，之后调用了它的<var>ReadFile</var>函数。这个函数需要一个文件路径，它的第二个参数是一些`后期处理`(Post-processing)的选项。除了加载文件之外，Assimp允许我们设定一些选项来强制它对导入的数据做一些额外的计算或操作。通过设定<var>aiProcess_Triangulate</var>，我们告诉Assimp，如果模型不是（全部）由三角形组成，它需要将模型所有的图元形状变换为三角形。<var>aiProcess_FlipUVs</var>将在处理的时候翻转y轴的纹理坐标（你可能还记得我们在[纹理](../01 Getting started/06 Textures.md)教程中说过，在OpenGL中大部分的图像的y轴都是反的，所以这个后期处理选项将会修复这个）。其它一些比较有用的选项有：
 
 - <var>aiProcess_GenNormals</var>：如果模型不包含法向量的话，就为每个顶点创建法线。
 - <var>aiProcess_SplitLargeMeshes</var>：将比较大的网格分割成更小的子网格，如果你的渲染有最大顶点数限制，只能渲染较小的网格，那么它会非常有用。
 - <var>aiProcess_OptimizeMeshes</var>：和上个选项相反，它会将多个小网格拼接为一个大的网格，减少绘制调用从而进行优化。
 
-Assimp提供了很多有用的后期处理指令，你可以在[这里](http://assimp.sourceforge.net/lib_html/postprocess_8h.html)找到全部的指令。实际上使用Assimp加载模型是非常容易的（你也可以看到）。困难的是之后使用返回的场景对象将加载的数据转换到一个<fun>Mesh</fun>对象的数组。
+Assimp提供了很多有用的后期处理指令，你可以在[这里](http://assimp.sourceforge.net/lib_html/postprocess_8h.html)找到全部的指令。实际上使用Assimp加载模型是非常容易的（你也可以看到）。困难的是之后使用返回的场景对象将加载的数据转换到一个`Mesh`对象的数组。
 
-完整的<fun>loadModel</fun>函数将会是这样的：
+完整的`loadModel`函数将会是这样的：
 
 ```c++
 void loadModel(string path)
@@ -92,11 +92,11 @@ void loadModel(string path)
 }
 ```
 
-在我们加载了模型之后，我们会检查场景和其根节点不为null，并且检查了它的一个标记(Flag)，来查看返回的数据是不是不完整的。如果遇到了任何错误，我们都会通过导入器的<fun>GetErrorString</fun>函数来报告错误并返回。我们也获取了文件路径的目录路径。
+在我们加载了模型之后，我们会检查场景和其根节点不为null，并且检查了它的一个标记(Flag)，来查看返回的数据是不是不完整的。如果遇到了任何错误，我们都会通过导入器的`GetErrorString`函数来报告错误并返回。我们也获取了文件路径的目录路径。
 
-如果什么错误都没有发生，我们希望处理场景中的所有节点，所以我们将第一个节点（根节点）传入了递归的<fun>processNode</fun>函数。因为每个节点（可能）包含有多个子节点，我们希望首先处理参数中的节点，再继续处理该节点所有的子节点，以此类推。这正符合一个递归结构，所以我们将定义一个递归函数。递归函数在做一些处理之后，使用不同的参数<def>递归</def>调用这个函数自身，直到某个条件被满足停止递归。在我们的例子中<def>退出条件</def>(Exit Condition)是所有的节点都被处理完毕。
+如果什么错误都没有发生，我们希望处理场景中的所有节点，所以我们将第一个节点（根节点）传入了递归的`processNode`函数。因为每个节点（可能）包含有多个子节点，我们希望首先处理参数中的节点，再继续处理该节点所有的子节点，以此类推。这正符合一个递归结构，所以我们将定义一个递归函数。递归函数在做一些处理之后，使用不同的参数`递归`调用这个函数自身，直到某个条件被满足停止递归。在我们的例子中`退出条件`(Exit Condition)是所有的节点都被处理完毕。
 
-你可能还记得Assimp的结构中，每个节点包含了一系列的网格索引，每个索引指向场景对象中的那个特定网格。我们接下来就想去获取这些网格索引，获取每个网格，处理每个网格，接着对每个节点的子节点重复这一过程。<fun>processNode</fun>函数的内容如下：
+你可能还记得Assimp的结构中，每个节点包含了一系列的网格索引，每个索引指向场景对象中的那个特定网格。我们接下来就想去获取这些网格索引，获取每个网格，处理每个网格，接着对每个节点的子节点重复这一过程。`processNode`函数的内容如下：
 
 ```c++
 void processNode(aiNode *node, const aiScene *scene)
@@ -115,22 +115,22 @@ void processNode(aiNode *node, const aiScene *scene)
 }
 ```
 
-我们首先检查每个节点的网格索引，并索引场景的<var>mMeshes</var>数组来获取对应的网格。返回的网格将会传递到<fun>processMesh</fun>函数中，它会返回一个<fun>Mesh</fun>对象，我们可以将它存储在<var>meshes</var>列表/vector。
+我们首先检查每个节点的网格索引，并索引场景的<var>mMeshes</var>数组来获取对应的网格。返回的网格将会传递到`processMesh`函数中，它会返回一个`Mesh`对象，我们可以将它存储在<var>meshes</var>列表/vector。
 
-所有网格都被处理之后，我们会遍历节点的所有子节点，并对它们调用相同的<fun>processMesh</fun>函数。当一个节点不再有任何子节点之后，这个函数将会停止执行。
+所有网格都被处理之后，我们会遍历节点的所有子节点，并对它们调用相同的`processMesh`函数。当一个节点不再有任何子节点之后，这个函数将会停止执行。
 
 !!! Important
 
-	认真的读者可能会发现，我们可以基本上忘掉处理任何的节点，只需要遍历场景对象的所有网格，就不需要为了索引做这一堆复杂的东西了。我们仍这么做的原因是，使用节点的最初想法是将网格之间定义一个父子关系。通过这样递归地遍历这层关系，我们就能将某个网格定义为另一个网格的父网格了。  
-	这个系统的一个使用案例是，当你想位移一个汽车的网格时，你可以保证它的所有子网格（比如引擎网格、方向盘网格、轮胎网格）都会随着一起位移。这样的系统能够用父子关系很容易地创建出来。
+> 认真的读者可能会发现，我们可以基本上忘掉处理任何的节点，只需要遍历场景对象的所有网格，就不需要为了索引做这一堆复杂的东西了。我们仍这么做的原因是，使用节点的最初想法是将网格之间定义一个父子关系。通过这样递归地遍历这层关系，我们就能将某个网格定义为另一个网格的父网格了。  
+> 这个系统的一个使用案例是，当你想位移一个汽车的网格时，你可以保证它的所有子网格（比如引擎网格、方向盘网格、轮胎网格）都会随着一起位移。这样的系统能够用父子关系很容易地创建出来。
+>
+> 然而，现在我们并没有使用这样一种系统，但如果你想对你的网格数据有更多的控制，通常都是建议使用这一种方法的。这种类节点的关系毕竟是由创建了这个模型的艺术家所定义。
 
-	然而，现在我们并没有使用这样一种系统，但如果你想对你的网格数据有更多的控制，通常都是建议使用这一种方法的。这种类节点的关系毕竟是由创建了这个模型的艺术家所定义。
-
-下一步就是将Assimp的数据解析到上一节中创建的<fun>Mesh</fun>类中。
+下一步就是将Assimp的数据解析到上一节中创建的`Mesh`类中。
 
 ### 从Assimp到网格
 
-将一个`aiMesh`对象转化为我们自己的网格对象不是那么困难。我们要做的只是访问网格的相关属性并将它们储存到我们自己的对象中。<fun>processMesh</fun>函数的大体结构如下：
+将一个`aiMesh`对象转化为我们自己的网格对象不是那么困难。我们要做的只是访问网格的相关属性并将它们储存到我们自己的对象中。`processMesh`函数的大体结构如下：
 
 ```c++
 Mesh processMesh(aiMesh *mesh, const aiScene *scene)
@@ -158,9 +158,9 @@ Mesh processMesh(aiMesh *mesh, const aiScene *scene)
 }
 ```
 
-处理网格的过程主要有三部分：获取所有的顶点数据，获取它们的网格索引，并获取相关的材质数据。处理后的数据将会储存在三个vector当中，我们会利用它们构建一个<fun>Mesh</fun>对象，并返回它到函数的调用者那里。
+处理网格的过程主要有三部分：获取所有的顶点数据，获取它们的网格索引，并获取相关的材质数据。处理后的数据将会储存在三个vector当中，我们会利用它们构建一个`Mesh`对象，并返回它到函数的调用者那里。
 
-获取顶点数据非常简单，我们定义了一个<fun>Vertex</fun>结构体，我们将在每个迭代之后将它加到<var>vertices</var>数组中。我们会遍历网格中的所有顶点（使用`mesh->mNumVertices`来获取）。在每个迭代中，我们希望使用所有的相关数据填充这个结构体。顶点的位置是这样处理的：
+获取顶点数据非常简单，我们定义了一个`Vertex`结构体，我们将在每个迭代之后将它加到<var>vertices</var>数组中。我们会遍历网格中的所有顶点（使用`mesh->mNumVertices`来获取）。在每个迭代中，我们希望使用所有的相关数据填充这个结构体。顶点的位置是这样处理的：
 
 ```c++
 glm::vec3 vector; 
@@ -174,7 +174,7 @@ vertex.Position = vector;
 
 !!! Important
 
-	Assimp将它的顶点位置数组叫做<var>mVertices</var>，这其实并不是那么直观。
+> Assimp将它的顶点位置数组叫做<var>mVertices</var>，这其实并不是那么直观。
 
 处理法线的步骤也是差不多的：
 
@@ -214,7 +214,7 @@ for(unsigned int i = 0; i < mesh->mNumFaces; i++)
 }
 ```
 
-所有的外部循环都结束了，我们现在有了一系列的顶点和索引数据，它们可以用来通过<fun>glDrawElements</fun>函数来绘制网格。然而，为了结束这个话题，并且对网格提供一些细节，我们还需要处理网格的材质。
+所有的外部循环都结束了，我们现在有了一系列的顶点和索引数据，它们可以用来通过`glDrawElements`函数来绘制网格。然而，为了结束这个话题，并且对网格提供一些细节，我们还需要处理网格的材质。
 
 ### 材质
 
@@ -233,9 +233,9 @@ if(mesh->mMaterialIndex >= 0)
 }
 ```
 
-我们首先从场景的<var>mMaterials</var>数组中获取`aiMaterial`对象。接下来我们希望加载网格的漫反射和/或镜面光贴图。一个材质对象的内部对每种纹理类型都存储了一个纹理位置数组。不同的纹理类型都以`aiTextureType_`为前缀。我们使用一个叫做<fun>loadMaterialTextures</fun>的工具函数来从材质中获取纹理。这个函数将会返回一个<fun>Texture</fun>结构体的vector，我们将在模型的<var>textures</var> vector的尾部之后存储它。
+我们首先从场景的<var>mMaterials</var>数组中获取`aiMaterial`对象。接下来我们希望加载网格的漫反射和/或镜面光贴图。一个材质对象的内部对每种纹理类型都存储了一个纹理位置数组。不同的纹理类型都以`aiTextureType_`为前缀。我们使用一个叫做`loadMaterialTextures`的工具函数来从材质中获取纹理。这个函数将会返回一个`Texture`结构体的vector，我们将在模型的<var>textures</var> vector的尾部之后存储它。
 
-<fun>loadMaterialTextures</fun>函数遍历了给定纹理类型的所有纹理位置，获取了纹理的文件位置，并加载并和生成了纹理，将信息储存在了一个<fun>Vertex</fun>结构体中。它看起来会像这样：
+`loadMaterialTextures`函数遍历了给定纹理类型的所有纹理位置，获取了纹理的文件位置，并加载并和生成了纹理，将信息储存在了一个`Vertex`结构体中。它看起来会像这样：
 
 ```c++
 vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
@@ -255,13 +255,13 @@ vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string
 }
 ```
 
-我们首先通过<fun>GetTextureCount</fun>函数检查储存在材质中纹理的数量，这个函数需要一个纹理类型。我们会使用<fun>GetTexture</fun>获取每个纹理的文件位置，它会将结果储存在一个`aiString`中。我们接下来使用另外一个叫做<fun>TextureFromFile</fun>的工具函数，它将会（用`stb_image.h`）加载一个纹理并返回该纹理的ID。如果你不确定这样的代码是如何写出来的话，可以查看最后的完整代码。
+我们首先通过`GetTextureCount`函数检查储存在材质中纹理的数量，这个函数需要一个纹理类型。我们会使用`GetTexture`获取每个纹理的文件位置，它会将结果储存在一个`aiString`中。我们接下来使用另外一个叫做`TextureFromFile`的工具函数，它将会（用`stb_image.h`）加载一个纹理并返回该纹理的ID。如果你不确定这样的代码是如何写出来的话，可以查看最后的完整代码。
 
 !!! Important
 
-	注意，我们假设了模型文件中纹理文件的路径是相对于模型文件的本地(Local)路径，比如说与模型文件处于同一目录下。我们可以将纹理位置字符串拼接到之前（在<fun>loadModel</fun>中）获取的目录字符串上，来获取完整的纹理路径（这也是为什么<fun>GetTexture</fun>函数也需要一个目录字符串）。
-
-	在网络上找到的某些模型会对纹理位置使用绝对(Absolute)路径，这就不能在每台机器上都工作了。在这种情况下，你可能会需要手动修改这个文件，来让它对纹理使用本地路径（如果可能的话）。
+> 注意，我们假设了模型文件中纹理文件的路径是相对于模型文件的本地(Local)路径，比如说与模型文件处于同一目录下。我们可以将纹理位置字符串拼接到之前（在`loadModel`中）获取的目录字符串上，来获取完整的纹理路径（这也是为什么`GetTexture`函数也需要一个目录字符串）。
+>
+> 在网络上找到的某些模型会对纹理位置使用绝对(Absolute)路径，这就不能在每台机器上都工作了。在这种情况下，你可能会需要手动修改这个文件，来让它对纹理使用本地路径（如果可能的话）。
 
 这就是使用Assimp导入模型的全部了。
 
@@ -285,7 +285,7 @@ struct Texture {
 vector<Texture> textures_loaded;
 ```
 
-之后，在<fun>loadMaterialTextures</fun>函数中，我们希望将纹理的路径与储存在<var>textures_loaded</var>这个vector中的所有纹理进行比较，看看当前纹理的路径是否与其中的一个相同。如果是的话，则跳过纹理加载/生成的部分，直接使用定位到的纹理结构体为网格的纹理。更新后的函数如下：
+之后，在`loadMaterialTextures`函数中，我们希望将纹理的路径与储存在<var>textures_loaded</var>这个vector中的所有纹理进行比较，看看当前纹理的路径是否与其中的一个相同。如果是的话，则跳过纹理加载/生成的部分，直接使用定位到的纹理结构体为网格的纹理。更新后的函数如下：
 
 ```c++
 vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string typeName)
@@ -325,7 +325,7 @@ vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string
 
 	有些版本的Assimp在使用调试版本或者使用IDE的调试模式下加载模型会非常缓慢，所以在你遇到缓慢的加载速度时，可以试试使用发布版本。
 
-你可以在[这里](https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/model.h)找到优化后<fun>Model</fun>类的完整源代码。
+你可以在[这里](https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/model.h)找到优化后`Model`类的完整源代码。
 
 # 和箱子模型告别
 
@@ -333,9 +333,9 @@ vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, string
 
 !!! Important
 
-	你从本网站中下载到的版本是修改过的版本，每个纹理的路径都被修改为了一个本地的相对路径，而不是原资源的绝对路径。
+> 你从本网站中下载到的版本是修改过的版本，每个纹理的路径都被修改为了一个本地的相对路径，而不是原资源的绝对路径。
 
-现在在代码中，声明一个<fun>Model</fun>对象，将模型的文件位置传入。接下来模型应该会自动加载并（如果没有错误的话）在渲染循环中使用它的<fun>Draw</fun>函数来绘制物体，这样就可以了。不再需要缓冲分配、属性指针和渲染指令，只需要一行代码就可以了。接下来如果你创建一系列着色器，其中片段着色器仅仅输出物体的漫反射纹理颜色，最终的结果看上去会是这样的：
+现在在代码中，声明一个`Model`对象，将模型的文件位置传入。接下来模型应该会自动加载并（如果没有错误的话）在渲染循环中使用它的`Draw`函数来绘制物体，这样就可以了。不再需要缓冲分配、属性指针和渲染指令，只需要一行代码就可以了。接下来如果你创建一系列着色器，其中片段着色器仅仅输出物体的漫反射纹理颜色，最终的结果看上去会是这样的：
 
 ![](../img/03/03/model_diffuse.png)
 

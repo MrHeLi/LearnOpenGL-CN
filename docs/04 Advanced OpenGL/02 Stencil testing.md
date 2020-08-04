@@ -6,13 +6,13 @@
 翻译     | Krasjet
 校对     | 暂未校对
 
-当片段着色器处理完一个片段之后，<def>模板测试</def>(Stencil Test)会开始执行，和深度测试一样，它也可能会丢弃片段。接下来，被保留的片段会进入深度测试，它可能会丢弃更多的片段。模板测试是根据又一个缓冲来进行的，它叫做<def>模板缓冲</def>(Stencil Buffer)，我们可以在渲染的时候更新它来获得一些很有意思的效果。
+当片段着色器处理完一个片段之后，**模板测试**(Stencil Test)会开始执行，和深度测试一样，它也可能会丢弃片段。接下来，被保留的片段会进入深度测试，它可能会丢弃更多的片段。模板测试是根据又一个缓冲来进行的，它叫做**模板缓冲**(Stencil Buffer)，我们可以在渲染的时候更新它来获得一些很有意思的效果。
 
-一个模板缓冲中，（通常）每个<def>模板值</def>(Stencil Value)是8位的。所以每个像素/片段一共能有256种不同的模板值。我们可以将这些模板值设置为我们想要的值，然后当某一个片段有某一个模板值的时候，我们就可以选择丢弃或是保留这个片段了。
+一个模板缓冲中，（通常）每个**模板值**(Stencil Value)是8位的。所以每个像素/片段一共能有256种不同的模板值。我们可以将这些模板值设置为我们想要的值，然后当某一个片段有某一个模板值的时候，我们就可以选择丢弃或是保留这个片段了。
 
 !!! Important
 
-	每个窗口库都需要为你配置一个模板缓冲。GLFW自动做了这件事，所以我们不需要告诉GLFW来创建一个，但其它的窗口库可能不会默认给你创建一个模板库，所以记得要查看库的文档。
+> 每个窗口库都需要为你配置一个模板缓冲。GLFW自动做了这件事，所以我们不需要告诉GLFW来创建一个，但其它的窗口库可能不会默认给你创建一个模板库，所以记得要查看库的文档。
 
 模板缓冲的一个简单的例子如下：
 
@@ -41,7 +41,7 @@ glEnable(GL_STENCIL_TEST);
 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 ```
 
-和深度测试的<fun>glDepthMask</fun>函数一样，模板缓冲也有一个类似的函数。<fun>glStencilMask</fun>允许我们设置一个位掩码(Bitmask)，它会与将要写入缓冲的模板值进行与(AND)运算。默认情况下设置的位掩码所有位都为1，不影响输出，但如果我们将它设置为`0x00`，写入缓冲的所有模板值最后都会变成0.这与深度测试中的<fun>glDepthMask(GL_FALSE)</fun>是等价的。
+和深度测试的`glDepthMask`函数一样，模板缓冲也有一个类似的函数。`glStencilMask`允许我们设置一个位掩码(Bitmask)，它会与将要写入缓冲的模板值进行与(AND)运算。默认情况下设置的位掩码所有位都为1，不影响输出，但如果我们将它设置为`0x00`，写入缓冲的所有模板值最后都会变成0.这与深度测试中的`glDepthMask(GL_FALSE)`是等价的。
 
 ```c++
 glStencilMask(0xFF); // 每一位写入模板缓冲时都保持原样
@@ -52,11 +52,11 @@ glStencilMask(0x00); // 每一位在写入模板缓冲时都会变成0（禁用�
 
 ## 模板函数
 
-和深度测试一样，我们对模板缓冲应该通过还是失败，以及它应该如何影响模板缓冲，也是有一定控制的。一共有两个函数能够用来配置模板测试：<fun>glStencilFunc</fun>和<fun>glStencilOp</fun>。
+和深度测试一样，我们对模板缓冲应该通过还是失败，以及它应该如何影响模板缓冲，也是有一定控制的。一共有两个函数能够用来配置模板测试：`glStencilFunc`和`glStencilOp`。
 
-<fun>glStencilFunc(GLenum func, GLint ref, GLuint mask)</fun>一共包含三个参数：
+`glStencilFunc(GLenum func, GLint ref, GLuint mask)`一共包含三个参数：
 
-- `func`：设置模板测试函数(Stencil Test Function)。这个测试函数将会应用到已储存的模板值上和<fun>glStencilFunc</fun>函数的`ref`值上。可用的选项有：<var>GL_NEVER</var>、<var>GL_LESS</var>、<var>GL_LEQUAL</var>、<var>GL_GREATER</var>、<var>GL_GEQUAL</var>、<var>GL_EQUAL</var>、<var>GL_NOTEQUAL</var>和<var>GL_ALWAYS</var>。它们的语义和深度缓冲的函数类似。
+- `func`：设置模板测试函数(Stencil Test Function)。这个测试函数将会应用到已储存的模板值上和`glStencilFunc`函数的`ref`值上。可用的选项有：<var>GL_NEVER</var>、<var>GL_LESS</var>、<var>GL_LEQUAL</var>、<var>GL_GREATER</var>、<var>GL_GEQUAL</var>、<var>GL_EQUAL</var>、<var>GL_NOTEQUAL</var>和<var>GL_ALWAYS</var>。它们的语义和深度缓冲的函数类似。
 - `ref`：设置了模板测试的参考值(Reference Value)。模板缓冲的内容将会与这个值进行比较。
 - `mask`：设置一个掩码，它将会与参考值和储存的模板值在测试比较它们之前进行与(AND)运算。初始情况下所有位都为1。
 
@@ -68,9 +68,9 @@ glStencilFunc(GL_EQUAL, 1, 0xFF)
 
 这会告诉OpenGL，只要一个片段的模板值等于(`GL_EQUAL`)参考值1，片段将会通过测试并被绘制，否则会被丢弃。
 
-但是<fun>glStencilFunc</fun>仅仅描述了OpenGL应该对模板缓冲内容做什么，而不是我们应该如何更新缓冲。这就需要<fun>glStencilOp</fun>这个函数了。
+但是`glStencilFunc`仅仅描述了OpenGL应该对模板缓冲内容做什么，而不是我们应该如何更新缓冲。这就需要`glStencilOp`这个函数了。
 
-<fun>glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass)</fun>一共包含三个选项，我们能够设定每个选项应该采取的行为：
+`glStencilOp(GLenum sfail, GLenum dpfail, GLenum dppass)`一共包含三个选项，我们能够设定每个选项应该采取的行为：
 
 - `sfail`：模板测试失败时采取的行为。
 - `dpfail`：模板测试通过，但深度测试失败时采取的行为。
@@ -82,20 +82,20 @@ glStencilFunc(GL_EQUAL, 1, 0xFF)
   ---|---
 GL_KEEP     | 保持当前储存的模板值
 GL_ZERO	    | 将模板值设置为0
-GL_REPLACE  | 将模板值设置为<fun>glStencilFunc</fun>函数设置的`ref`值
+GL_REPLACE  | 将模板值设置为`glStencilFunc`函数设置的`ref`值 
 GL_INCR	    | 如果模板值小于最大值则将模板值加1
 GL_INCR_WRAP| 与<var>GL_INCR</var>一样，但如果模板值超过了最大值则归零
 GL_DECR	    | 如果模板值大于最小值则将模板值减1
 GL_DECR_WRAP| 与<var>GL_DECR</var>一样，但如果模板值小于0则将其设置为最大值
 GL_INVERT   | 按位翻转当前的模板缓冲值
 
-默认情况下<fun>glStencilOp</fun>是设置为`(GL_KEEP, GL_KEEP, GL_KEEP)`的，所以不论任何测试的结果是如何，模板缓冲都会保留它的值。默认的行为不会更新模板缓冲，所以如果你想写入模板缓冲的话，你需要至少对其中一个选项设置不同的值。
+默认情况下`glStencilOp`是设置为`(GL_KEEP, GL_KEEP, GL_KEEP)`的，所以不论任何测试的结果是如何，模板缓冲都会保留它的值。默认的行为不会更新模板缓冲，所以如果你想写入模板缓冲的话，你需要至少对其中一个选项设置不同的值。
 
-所以，通过使用<fun>glStencilFunc</fun>和<fun>glStencilOp</fun>，我们可以精确地指定更新模板缓冲的时机与行为了，我们也可以指定什么时候该让模板缓冲通过，即什么时候片段需要被丢弃。
+所以，通过使用`glStencilFunc`和`glStencilOp`，我们可以精确地指定更新模板缓冲的时机与行为了，我们也可以指定什么时候该让模板缓冲通过，即什么时候片段需要被丢弃。
 
 # 物体轮廓
 
-仅仅看了前面的部分你还是不太可能能够完全理解模板测试的工作原理，所以我们将会展示一个使用模板测试就可以完成的有用特性，它叫做<def>物体轮廓</def>(Object Outlining)。
+仅仅看了前面的部分你还是不太可能能够完全理解模板测试的工作原理，所以我们将会展示一个使用模板测试就可以完成的有用特性，它叫做**物体轮廓**(Object Outlining)。
 
 ![](../img/04/02/stencil_object_outlining.png)
 
@@ -129,7 +129,7 @@ glEnable(GL_STENCIL_TEST);
 glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 ```
 
-如果其中的一个测试失败了，我们什么都不做，我们仅仅保留当前储存在模板缓冲中的值。如果模板测试和深度测试都通过了，那么我们希望将储存的模板值设置为参考值，参考值能够通过<fun>glStencilFunc</fun>来设置，我们之后会设置为1。
+如果其中的一个测试失败了，我们什么都不做，我们仅仅保留当前储存在模板缓冲中的值。如果模板测试和深度测试都通过了，那么我们希望将储存的模板值设置为参考值，参考值能够通过`glStencilFunc`来设置，我们之后会设置为1。
 
 我们将模板缓冲清除为0，对箱子中所有绘制的片段，将模板值更新为1：
 
@@ -191,7 +191,7 @@ glEnable(GL_DEPTH_TEST);
 
 !!! Important
 
-	你可以看到这两个箱子的边框重合了，这通常都是我们想要的结果（想想策略游戏中，我们希望选择10个单位，合并边框通常是我们想需要的结果）。如果你想让每个物体都有一个完整的边框，你需要对每个物体都清空模板缓冲，并有创意地利用深度缓冲。
+> 你可以看到这两个箱子的边框重合了，这通常都是我们想要的结果（想想策略游戏中，我们希望选择10个单位，合并边框通常是我们想需要的结果）。如果你想让每个物体都有一个完整的边框，你需要对每个物体都清空模板缓冲，并有创意地利用深度缓冲。
 
 你看到的物体轮廓算法在需要显示选中物体的游戏（想想策略游戏）中非常常见。这样的算法能够在一个模型类中轻松实现。你可以在模型类中设置一个boolean标记，来设置需不需要绘制边框。如果你有创造力的话，你也可以使用后期处理滤镜(Filter)，像是高斯模糊(Gaussian Blur)，让边框看起来更自然。
 

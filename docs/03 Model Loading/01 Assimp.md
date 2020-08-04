@@ -8,7 +8,7 @@
 
 到目前为止的所有场景中，我们一直都在滥用我们的箱子朋友，但时间久了甚至是我们最好的朋友也会感到无聊。在日常的图形程序中，通常都会使用非常复杂且好玩的模型，它们比静态的箱子要好看多了。然而，和箱子对象不同，我们不太能够对像是房子、汽车或者人形角色这样的复杂形状手工定义所有的顶点、法线和纹理坐标。我们想要的是将这些模型(Model)**导入**(Import)到程序当中。模型通常都由3D艺术家在[Blender](http://www.blender.org/)、[3DS Max](http://www.autodesk.nl/products/3ds-max/overview)或者[Maya](http://www.autodesk.com/products/autodesk-maya/overview)这样的工具中精心制作。
 
-这些所谓的<def>3D建模工具</def>(3D Modeling Tool)可以让艺术家创建复杂的形状，并使用一种叫做<def>UV映射</def>(uv-mapping)的手段来应用贴图。这些工具将会在导出到模型文件的时候自动生成所有的顶点坐标、顶点法线以及纹理坐标。这样子艺术家们即使不了解图形技术细节的情况下，也能拥有一套强大的工具来构建高品质的模型了。所有的技术细节都隐藏在了导出的模型文件中。但是，作为图形开发者，我们就**必须**要了解这些技术细节了。
+这些所谓的**3D建模工具**(3D Modeling Tool)可以让艺术家创建复杂的形状，并使用一种叫做**UV映射**(uv-mapping)的手段来应用贴图。这些工具将会在导出到模型文件的时候自动生成所有的顶点坐标、顶点法线以及纹理坐标。这样子艺术家们即使不了解图形技术细节的情况下，也能拥有一套强大的工具来构建高品质的模型了。所有的技术细节都隐藏在了导出的模型文件中。但是，作为图形开发者，我们就**必须**要了解这些技术细节了。
 
 所以，我们的工作就是解析这些导出的模型文件以及提取所有有用的信息，将它们储存为OpenGL能够理解的格式。一个很常见的问题是，模型的文件格式有很多种，每一种都会以它们自己的方式来导出模型数据。像是[Wavefront的.obj](http://en.wikipedia.org/wiki/Wavefront_.obj_file)这样的模型格式，只包含了模型数据以及材质信息，像是模型颜色和漫反射/镜面光贴图。而以XML为基础的[Collada文件格式](http://en.wikipedia.org/wiki/COLLADA)则非常的丰富，包含模型、光照、多种材质、动画数据、摄像机、完整的场景信息等等。Wavefront的.obj格式通常被认为是一个易于解析的模型格式。建议至少去Wavefront的wiki页面上看看文件格式的信息是如何封装的。这应该能让你认识到模型文件的基本结构。
 
@@ -32,11 +32,11 @@
 
 !!! Important
 
-	**网格**
+> **网格**
+>
+> 当使用建模工具对物体建模的时候，艺术家通常不会用单个形状创建出整个模型。通常每个模型都由几个子模型/形状组合而成。组合模型的每个单独的形状就叫做一个**网格**(Mesh)。比如说有一个人形的角色：艺术家通常会将头部、四肢、衣服、武器建模为分开的组件，并将这些网格组合而成的结果表现为最终的模型。一个网格是我们在OpenGL中绘制物体所需的最小单位（顶点数据、索引和材质属性）。一个模型（通常）会包括多个网格。
 
-	当使用建模工具对物体建模的时候，艺术家通常不会用单个形状创建出整个模型。通常每个模型都由几个子模型/形状组合而成。组合模型的每个单独的形状就叫做一个<def>网格</def>(Mesh)。比如说有一个人形的角色：艺术家通常会将头部、四肢、衣服、武器建模为分开的组件，并将这些网格组合而成的结果表现为最终的模型。一个网格是我们在OpenGL中绘制物体所需的最小单位（顶点数据、索引和材质属性）。一个模型（通常）会包括多个网格。
-
-在[下一节](02 Mesh.md)中，我们将创建我们自己的<fun>Model</fun>和<fun>Mesh</fun>类来加载并使用刚刚介绍的结构储存导入后的模型。如果我们想要绘制一个模型，我们不需要将整个模型渲染为一个整体，只需要渲染组成模型的每个独立的网格就可以了。然而，在我们开始导入模型之前，我们首先需要将Assimp包含到我们的工程当中。
+在[下一节](02 Mesh.md)中，我们将创建我们自己的`Model`和`Mesh`类来加载并使用刚刚介绍的结构储存导入后的模型。如果我们想要绘制一个模型，我们不需要将整个模型渲染为一个整体，只需要渲染组成模型的每个独立的网格就可以了。然而，在我们开始导入模型之前，我们首先需要将Assimp包含到我们的工程当中。
 
 ## 构建Assimp
 
@@ -45,14 +45,12 @@
 构建Assimp时可能会出现一些问题，所以我会将它们的解决方案列在这里，便于大家排除错误：
 
 - CMake在读取配置列表时，不断报出DirectX库丢失的错误。报错如下：
- 
-```
-Could not locate DirectX
-CMake Error at cmake-modules/FindPkgMacros.cmake:110 (message):
-Required library DirectX not found! Install the library (including dev packages) 
-and try again. If the library is already installed, set the missing variables 
-manually in cmake.
-```
+
+> Could not locate DirectX
+> CMake Error at cmake-modules/FindPkgMacros.cmake:110 (message):
+> Required library DirectX not found! Install the library (including dev packages) 
+> and try again. If the library is already installed, set the missing variables 
+> manually in cmake.
 
 这个问题的解决方案是安装DirectX SDK，如果你之前没安装过的话。你可以从[这里](http://www.microsoft.com/en-us/download/details.aspx?id=6812)下载SDK。
 
@@ -66,6 +64,6 @@ manually in cmake.
 
 !!! Important
 
-	如果你想让Assimp使用多线程来获得更高的性能，你可以使用Boost库来编译Assimp。你可以在它们的[安装页面](http://assimp.org/lib_html/install.html)找到完整的安装介绍。
+> 如果你想让Assimp使用多线程来获得更高的性能，你可以使用Boost库来编译Assimp。你可以在它们的[安装页面](http://assimp.org/lib_html/install.html)找到完整的安装介绍。
 
 现在，你应该已经编译完Assimp库并将它链接到你的程序中了。下一步：[导入](02 Mesh.md)漂亮的3D物体！

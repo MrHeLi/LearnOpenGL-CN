@@ -6,7 +6,7 @@
 翻译     | Krasjet, [Django](http://bullteacher.com/)
 校对     | 暂未校对
 
-在学习渲染的旅途中，你可能会时不时遇到模型边缘有锯齿的情况。这些<def>锯齿边缘</def>(Jagged Edges)的产生和光栅器将顶点数据转化为片段的方式有关。在下面的例子中，你可以看到，我们只是绘制了一个简单的立方体，你就能注意到它存在锯齿边缘了：
+在学习渲染的旅途中，你可能会时不时遇到模型边缘有锯齿的情况。这些**锯齿边缘**(Jagged Edges)的产生和光栅器将顶点数据转化为片段的方式有关。在下面的例子中，你可以看到，我们只是绘制了一个简单的立方体，你就能注意到它存在锯齿边缘了：
 
 ![](../img/04/11/anti_aliasing_aliasing.png)
 
@@ -14,11 +14,11 @@
 
 ![](../img/04/11/anti_aliasing_zoomed.png)
 
-这很明显不是我们想要在最终程序中所实现的效果。你能够清楚看见形成边缘的像素。这种现象被称之为<def>走样</def>(Aliasing)。有很多种抗锯齿（Anti-aliasing，也被称为反走样）的技术能够帮助我们缓解这种现象，从而产生更**平滑**的边缘。
+这很明显不是我们想要在最终程序中所实现的效果。你能够清楚看见形成边缘的像素。这种现象被称之为**走样**(Aliasing)。有很多种抗锯齿（Anti-aliasing，也被称为反走样）的技术能够帮助我们缓解这种现象，从而产生更**平滑**的边缘。
 
-最开始我们有一种叫做<def>超采样抗锯齿</def>(Super Sample Anti-aliasing, SSAA)的技术，它会使用比正常分辨率更高的分辨率（即超采样）来渲染场景，当图像输出在帧缓冲中更新时，分辨率会被下采样(Downsample)至正常的分辨率。这些**额外的**分辨率会被用来防止锯齿边缘的产生。虽然它确实能够解决走样的问题，但是由于这样比平时要绘制更多的片段，它也会带来很大的性能开销。所以这项技术只拥有了短暂的辉煌。
+最开始我们有一种叫做**超采样抗锯齿**(Super Sample Anti-aliasing, SSAA)的技术，它会使用比正常分辨率更高的分辨率（即超采样）来渲染场景，当图像输出在帧缓冲中更新时，分辨率会被下采样(Downsample)至正常的分辨率。这些**额外的**分辨率会被用来防止锯齿边缘的产生。虽然它确实能够解决走样的问题，但是由于这样比平时要绘制更多的片段，它也会带来很大的性能开销。所以这项技术只拥有了短暂的辉煌。
 
-然而，在这项技术的基础上也诞生了更为现代的技术，叫做<def>多重采样抗锯齿</def>(Multisample Anti-aliasing, MSAA)。它借鉴了SSAA背后的理念，但却以更加高效的方式实现了抗锯齿。我们在这一节中会深度讨论OpenGL中内建的MSAA技术。
+然而，在这项技术的基础上也诞生了更为现代的技术，叫做**多重采样抗锯齿**(Multisample Anti-aliasing, MSAA)。它借鉴了SSAA背后的理念，但却以更加高效的方式实现了抗锯齿。我们在这一节中会深度讨论OpenGL中内建的MSAA技术。
 
 ## 多重采样
 
@@ -28,7 +28,7 @@
 
 ![](../img/04/11/anti_aliasing_rasterization.png)
 
-这里我们可以看到一个屏幕像素的网格，每个像素的中心包含有一个<def>采样点</def>(Sample Point)，它会被用来决定这个三角形是否遮盖了某个像素。图中红色的采样点被三角形所遮盖，在每一个遮住的像素处都会生成一个片段。虽然三角形边缘的一些部分也遮住了某些屏幕像素，但是这些像素的采样点并没有被三角形**内部**所遮盖，所以它们不会受到片段着色器的影响。
+这里我们可以看到一个屏幕像素的网格，每个像素的中心包含有一个**采样点**(Sample Point)，它会被用来决定这个三角形是否遮盖了某个像素。图中红色的采样点被三角形所遮盖，在每一个遮住的像素处都会生成一个片段。虽然三角形边缘的一些部分也遮住了某些屏幕像素，但是这些像素的采样点并没有被三角形**内部**所遮盖，所以它们不会受到片段着色器的影响。
 
 你现在可能已经清楚走样的原因了。完整渲染后的三角形在屏幕上会是这样的：
 
@@ -44,7 +44,7 @@
 
 !!! Important
 
-    采样点的数量可以是任意的，更多的采样点能带来更精确的遮盖率。
+> 采样点的数量可以是任意的，更多的采样点能带来更精确的遮盖率。
 
 从这里开始多重采样就变得有趣起来了。我们知道三角形只遮盖了2个子采样点，所以下一步是决定这个像素的颜色。你的猜想可能是，我们对每个被遮盖住的子采样点运行一次片段着色器，最后将每个像素所有子采样点的颜色平均一下。在这个例子中，我们需要在两个子采样点上对被插值的顶点数据运行两次片段着色器，并将结果的颜色储存在这些采样点中。（幸运的是）这并**不是**它工作的方式，因为这本质上说还是需要运行更多次的片段着色器，会显著地降低性能。
 
@@ -71,23 +71,23 @@ MSAA真正的工作方式是，无论三角形遮盖了多少个子采样点，�
 
 ## OpenGL中的MSAA
 
-如果我们想要在OpenGL中使用MSAA，我们必须要使用一个能在每个像素中存储大于1个颜色值的颜色缓冲（因为多重采样需要我们为每个采样点都储存一个颜色）。所以，我们需要一个新的缓冲类型，来存储特定数量的多重采样样本，它叫做<def>多重采样缓冲</def>(Multisample Buffer)。
+如果我们想要在OpenGL中使用MSAA，我们必须要使用一个能在每个像素中存储大于1个颜色值的颜色缓冲（因为多重采样需要我们为每个采样点都储存一个颜色）。所以，我们需要一个新的缓冲类型，来存储特定数量的多重采样样本，它叫做**多重采样缓冲**(Multisample Buffer)。
 
-大多数的窗口系统都应该提供了一个多重采样缓冲，用以代替默认的颜色缓冲。GLFW同样给了我们这个功能，我们所要做的只是**提示**(Hint) GLFW，我们希望使用一个包含N个样本的多重采样缓冲。这可以在创建窗口之前调用<fun>glfwWindowHint</fun>来完成。
+大多数的窗口系统都应该提供了一个多重采样缓冲，用以代替默认的颜色缓冲。GLFW同样给了我们这个功能，我们所要做的只是**提示**(Hint) GLFW，我们希望使用一个包含N个样本的多重采样缓冲。这可以在创建窗口之前调用`glfwWindowHint`来完成。
 
 ```c++
 glfwWindowHint(GLFW_SAMPLES, 4);
 ```
 
-现在再调用<fun>glfwCreateWindow</fun>创建渲染窗口时，每个屏幕坐标就会使用一个包含4个子采样点的颜色缓冲了。GLFW会自动创建一个每像素4个子采样点的深度和样本缓冲。这也意味着所有缓冲的大小都增长了4倍。
+现在再调用`glfwCreateWindow`创建渲染窗口时，每个屏幕坐标就会使用一个包含4个子采样点的颜色缓冲了。GLFW会自动创建一个每像素4个子采样点的深度和样本缓冲。这也意味着所有缓冲的大小都增长了4倍。
 
-现在我们已经向GLFW请求了多重采样缓冲，我们还需要调用<fun>glEnable</fun>并启用<var>GL_MULTISAMPLE</var>，来启用多重采样。在大多数OpenGL的驱动上，多重采样都是默认启用的，所以这个调用可能会有点多余，但显式地调用一下会更保险一点。这样子不论是什么OpenGL的实现都能够正常启用多重采样了。
+现在我们已经向GLFW请求了多重采样缓冲，我们还需要调用`glEnable`并启用<var>GL_MULTISAMPLE</var>，来启用多重采样。在大多数OpenGL的驱动上，多重采样都是默认启用的，所以这个调用可能会有点多余，但显式地调用一下会更保险一点。这样子不论是什么OpenGL的实现都能够正常启用多重采样了。
 
 ```c++
 glEnable(GL_MULTISAMPLE);
 ```
 
-只要默认的帧缓冲有了多重采样缓冲的附件，我们所要做的只是调用<fun>glEnable</fun>来启用多重采样。因为多重采样的算法都在OpenGL驱动的光栅器中实现了，我们不需要再多做什么。如果现在再来渲染本节一开始的那个绿色的立方体，我们应该能看到更平滑的边缘：
+只要默认的帧缓冲有了多重采样缓冲的附件，我们所要做的只是调用`glEnable`来启用多重采样。因为多重采样的算法都在OpenGL驱动的光栅器中实现了，我们不需要再多做什么。如果现在再来渲染本节一开始的那个绿色的立方体，我们应该能看到更平滑的边缘：
 
 ![](../img/04/11/anti_aliasing_multisampled.png)
 
@@ -101,7 +101,7 @@ glEnable(GL_MULTISAMPLE);
 
 ### 多重采样纹理附件
 
-为了创建一个支持储存多个采样点的纹理，我们使用<fun>glTexImage2DMultisample</fun>来替代<fun>glTexImage2D</fun>，它的纹理目标是<var>GL_TEXTURE_2D_MULTISAPLE</var>。
+为了创建一个支持储存多个采样点的纹理，我们使用`glTexImage2DMultisample`来替代`glTexImage2D`，它的纹理目标是<var>GL_TEXTURE_2D_MULTISAPLE</var>。
 
 ```c++
 glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, tex);
@@ -111,7 +111,7 @@ glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, 0);
 
 它的第二个参数设置的是纹理所拥有的样本个数。如果最后一个参数为<var>GL_TRUE</var>，图像将会对每个纹素使用相同的样本位置以及相同数量的子采样点个数。
 
-我们使用<fun>glFramebufferTexture2D</fun>将多重采样纹理附加到帧缓冲上，但这里纹理类型使用的是<var>GL_TEXTURE_2D_MULTISAMPLE</var>。
+我们使用`glFramebufferTexture2D`将多重采样纹理附加到帧缓冲上，但这里纹理类型使用的是<var>GL_TEXTURE_2D_MULTISAMPLE</var>。
 
 ```c++
 glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, tex, 0);
@@ -121,7 +121,7 @@ glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTI
 
 ### 多重采样渲染缓冲对象
 
-和纹理类似，创建一个多重采样渲染缓冲对象并不难。我们所要做的只是在指定（当前绑定的）渲染缓冲的内存存储时，将<fun>glRenderbufferStorage</fun>的调用改为<fun>glRenderbufferStorageMultisample</fun>就可以了。
+和纹理类似，创建一个多重采样渲染缓冲对象并不难。我们所要做的只是在指定（当前绑定的）渲染缓冲的内存存储时，将`glRenderbufferStorage`的调用改为`glRenderbufferStorageMultisample`就可以了。
 
 ```c++
 glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width, height);
@@ -133,9 +133,9 @@ glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH24_STENCIL8, width,
 
 渲染到多重采样帧缓冲对象的过程都是自动的。只要我们在帧缓冲绑定时绘制任何东西，光栅器就会负责所有的多重采样运算。我们最终会得到一个多重采样颜色缓冲以及/或深度和模板缓冲。因为多重采样缓冲有一点特别，我们不能直接将它们的缓冲图像用于其他运算，比如在着色器中对它们进行采样。
 
-一个多重采样的图像包含比普通图像更多的信息，我们所要做的是缩小或者<def>还原</def>(Resolve)图像。多重采样帧缓冲的还原通常是通过<fun>glBlitFramebuffer</fun>来完成，它能够将一个帧缓冲中的某个区域复制到另一个帧缓冲中，并且将多重采样缓冲还原。
+一个多重采样的图像包含比普通图像更多的信息，我们所要做的是缩小或者**还原**(Resolve)图像。多重采样帧缓冲的还原通常是通过`glBlitFramebuffer`来完成，它能够将一个帧缓冲中的某个区域复制到另一个帧缓冲中，并且将多重采样缓冲还原。
 
-<fun>glBlitFramebuffer</fun>会将一个用4个屏幕空间坐标所定义的<def>源</def>区域复制到一个同样用4个屏幕空间坐标所定义的<def>目标</def>区域中。你可能记得在[帧缓冲](05 Framebuffers.md)教程中，当我们绑定到<var>GL_FRAMEBUFFER</var>时，我们是同时绑定了读取和绘制的帧缓冲目标。我们也可以将帧缓冲分开绑定至<var>GL_READ_FRAMEBUFFER</var>与<var>GL_DRAW_FRAMEBUFFER</var>。<fun>glBlitFramebuffer</fun>函数会根据这两个目标，决定哪个是源帧缓冲，哪个是目标帧缓冲。接下来，我们可以将图像<def>位块传送</def>(Blit)到默认的帧缓冲中，将多重采样的帧缓冲传送到屏幕上。
+`glBlitFramebuffer`会将一个用4个屏幕空间坐标所定义的**源**区域复制到一个同样用4个屏幕空间坐标所定义的**目标**区域中。你可能记得在[帧缓冲](05 Framebuffers.md)教程中，当我们绑定到<var>GL_FRAMEBUFFER</var>时，我们是同时绑定了读取和绘制的帧缓冲目标。我们也可以将帧缓冲分开绑定至<var>GL_READ_FRAMEBUFFER</var>与<var>GL_DRAW_FRAMEBUFFER</var>。`glBlitFramebuffer`函数会根据这两个目标，决定哪个是源帧缓冲，哪个是目标帧缓冲。接下来，我们可以将图像**位块传送**(Blit)到默认的帧缓冲中，将多重采样的帧缓冲传送到屏幕上。
 
 ```c++
 glBindFramebuffer(GL_READ_FRAMEBUFFER, multisampledFBO);
@@ -192,13 +192,13 @@ while(!glfwWindowShouldClose(window))
 
 将一个多重采样的纹理图像不进行还原直接传入着色器也是可行的。GLSL提供了这样的选项，让我们能够对纹理图像的每个子样本进行采样，所以我们可以创建我们自己的抗锯齿算法。在大型的图形应用中通常都会这么做。
 
-要想获取每个子样本的颜色值，你需要将纹理uniform采样器设置为<fun>sampler2DMS</fun>，而不是平常使用的<fun>sampler2D</fun>：
+要想获取每个子样本的颜色值，你需要将纹理uniform采样器设置为`sampler2DMS`，而不是平常使用的`sampler2D`：
 
 ```c++
 uniform sampler2DMS screenTextureMS;
 ```
 
-使用<fun>texelFetch</fun>函数就能够获取每个子样本的颜色值了：
+使用`texelFetch`函数就能够获取每个子样本的颜色值了：
 
 ```c++
 vec4 colorSample = texelFetch(screenTextureMS, TexCoords, 3);  // 第4个子样本

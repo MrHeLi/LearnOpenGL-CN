@@ -26,7 +26,7 @@ glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
 
 !!! important
 
-	不要忘记正z轴是从屏幕指向你的，如果我们希望摄像机向后移动，我们就沿着z轴的正方向移动。
+> 不要忘记正z轴是从屏幕指向你的，如果我们希望摄像机向后移动，我们就沿着z轴的正方向移动。
 
 ### 2. 摄像机方向
 
@@ -39,7 +39,7 @@ glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
 !!! Attention
 
-	**方向**向量(Direction Vector)并不是最好的名字，因为它实际上指向从它到目标向量的相反方向（译注：注意看前面的那个图，蓝色的方向向量大概指向z轴的正方向，与摄像机实际指向的方向是正好相反的）。
+> **方向**向量(Direction Vector)并不是最好的名字，因为它实际上指向从它到目标向量的相反方向（译注：注意看前面的那个图，蓝色的方向向量大概指向z轴的正方向，与摄像机实际指向的方向是正好相反的）。
 
 ### 3. 右轴
 
@@ -68,7 +68,7 @@ $$
 LookAt = \begin{bmatrix} \color{red}{R_x} & \color{red}{R_y} & \color{red}{R_z} & 0 \\ \color{green}{U_x} & \color{green}{U_y} & \color{green}{U_z} & 0 \\ \color{blue}{D_x} & \color{blue}{D_y} & \color{blue}{D_z} & 0 \\ 0 & 0 & 0  & 1 \end{bmatrix} * \begin{bmatrix} 1 & 0 & 0 & -\color{purple}{P_x} \\ 0 & 1 & 0 & -\color{purple}{P_y} \\ 0 & 0 & 1 & -\color{purple}{P_z} \\ 0 & 0 & 0  & 1 \end{bmatrix}
 $$
 
-其中\(\color{red}R\)是右向量，\(\color{green}U\)是上向量，\(\color{blue}D\)是方向向量\(\color{purple}P\)是摄像机位置向量。注意，位置向量是相反的，因为我们最终希望把世界平移到与我们自身移动的相反方向。把这个LookAt矩阵作为观察矩阵可以很高效地把所有世界坐标变换到刚刚定义的观察空间。LookAt矩阵就像它的名字表达的那样：它会创建一个看着(Look at)给定目标的观察矩阵。
+其中$(\color{red}R)$是右向量，$(\color{green}U)$是上向量，$(\color{blue}D)$是方向向量$(\color{purple}P)$是摄像机位置向量。注意，位置向量是相反的，因为我们最终希望把世界平移到与我们自身移动的相反方向。把这个LookAt矩阵作为观察矩阵可以很高效地把所有世界坐标变换到刚刚定义的观察空间。LookAt矩阵就像它的名字表达的那样：它会创建一个看着(Look at)给定目标的观察矩阵。
 
 幸运的是，GLM已经提供了这些支持。我们要做的只是定义一个摄像机位置，一个目标位置和一个表示世界空间中的上向量的向量（我们计算右向量使用的那个上向量）。接着GLM就会创建一个LookAt矩阵，我们可以把它当作我们的观察矩阵：
 
@@ -79,11 +79,11 @@ view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
   		   glm::vec3(0.0f, 1.0f, 0.0f));
 ```
 
-<fun>glm::LookAt</fun>函数需要一个位置、目标和上向量。它会创建一个和在上一节使用的一样的观察矩阵。
+`glm::LookAt`函数需要一个位置、目标和上向量。它会创建一个和在上一节使用的一样的观察矩阵。
 
 在讨论用户输入之前，我们先来做些有意思的事，把我们的摄像机在场景中旋转。我们会将摄像机的注视点保持在(0, 0, 0)。
 
-我们需要用到一点三角学的知识来在每一帧创建一个x和z坐标，它会代表圆上的一点，我们将会使用它作为摄像机的位置。通过重新计算x和y坐标，我们会遍历圆上的所有点，这样摄像机就会绕着场景旋转了。我们预先定义这个圆的半径<var>radius</var>，在每次渲染迭代中使用GLFW的<fun>glfwGetTime</fun>函数重新创建观察矩阵，来扩大这个圆。
+我们需要用到一点三角学的知识来在每一帧创建一个x和z坐标，它会代表圆上的一点，我们将会使用它作为摄像机的位置。通过重新计算x和y坐标，我们会遍历圆上的所有点，这样摄像机就会绕着场景旋转了。我们预先定义这个圆的半径<var>radius</var>，在每次渲染迭代中使用GLFW的`glfwGetTime`函数重新创建观察矩阵，来扩大这个圆。
 
 ```c++
 float radius = 10.0f;
@@ -95,7 +95,7 @@ view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::ve
 
 如果你运行代码，应该会得到下面的结果：
 
-<video src="../../img/01/09/camera_circle.mp4" controls="controls">
+<video src="../img/01/09/camera_circle.mp4" controls="controls">
 </video>
 
 通过这一小段代码，摄像机现在会随着时间流逝围绕场景转动了。自己试试改变半径和位置/方向参数，看看**LookAt**矩阵是如何工作的。同时，如果你在哪卡住的话，这里有[源码](https://learnopengl.com/code_viewer_gh.php?code=src/1.getting_started/7.1.camera_circle/camera_circle.cpp)。
@@ -118,7 +118,7 @@ view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
 我们首先将摄像机位置设置为之前定义的<var>cameraPos</var>。方向是当前的位置加上我们刚刚定义的方向向量。这样能保证无论我们怎么移动，摄像机都会注视着目标方向。让我们摆弄一下这些向量，在按下某些按钮时更新<var>cameraPos</var>向量。
 
-我们已经为GLFW的键盘输入定义过一个<fun>processInput</fun>函数了，我们来新添加几个需要检查的按键命令：
+我们已经为GLFW的键盘输入定义过一个`processInput`函数了，我们来新添加几个需要检查的按键命令：
 
 ```c++
 void processInput(GLFWwindow *window)
@@ -140,13 +140,13 @@ void processInput(GLFWwindow *window)
 
 !!! important
 
-	注意，我们对**右向量**进行了标准化。如果我们没对这个向量进行标准化，最后的叉乘结果会根据<var>cameraFront</var>变量返回大小不同的向量。如果我们不对向量进行标准化，我们就得根据摄像机的朝向不同加速或减速移动了，但如果进行了标准化移动就是匀速的。
+> 注意，我们对**右向量**进行了标准化。如果我们没对这个向量进行标准化，最后的叉乘结果会根据<var>cameraFront</var>变量返回大小不同的向量。如果我们不对向量进行标准化，我们就得根据摄像机的朝向不同加速或减速移动了，但如果进行了标准化移动就是匀速的。
 
 现在你就应该能够移动摄像机了，虽然移动速度和系统有关，你可能会需要调整一下<var>cameraSpeed</var>。
 
 ## 移动速度
 
-目前我们的移动速度是个常量。理论上没什么问题，但是实际情况下根据处理器的能力不同，有些人可能会比其他人每秒绘制更多帧，也就是以更高的频率调用<fun>processInput</fun>函数。结果就是，根据配置的不同，有些人可能移动很快，而有些人会移动很慢。当你发布你的程序的时候，你必须确保它在所有硬件上移动速度都一样。
+目前我们的移动速度是个常量。理论上没什么问题，但是实际情况下根据处理器的能力不同，有些人可能会比其他人每秒绘制更多帧，也就是以更高的频率调用`processInput`函数。结果就是，根据配置的不同，有些人可能移动很快，而有些人会移动很慢。当你发布你的程序的时候，你必须确保它在所有硬件上移动速度都一样。
 
 图形程序和游戏通常会跟踪一个<def>时间差</def>(Deltatime)变量，它储存了渲染上一帧所用的时间。我们把所有速度都去乘以<var>deltaTime</var>值。结果就是，如果我们的<var>deltaTime</var>很大，就意味着上一帧的渲染花费了更多时间，所以这一帧的速度需要变得更高来平衡渲染所花去的时间。使用这种方法时，无论你的电脑快还是慢，摄像机的速度都会相应平衡，这样每个用户的体验就都一样了。
 
@@ -177,8 +177,7 @@ void processInput(GLFWwindow *window)
 
 与前面的部分结合在一起，我们有了一个更流畅点的摄像机系统：
 
-
-<video src="../../img/01/09/camera_smooth.mp4" controls="controls">
+<video src="../img/01/09/camera_smooth.mp4" controls="controls">
 </video>
 
 现在我们有了一个在任何系统上移动速度都一样的摄像机。同样，如果你卡住了，查看一下[源码](https://learnopengl.com/code_viewer_gh.php?code=src/1.getting_started/7.2.camera_keyboard_dt/camera_keyboard_dt.cpp)。我们可以看到任何移动都会影响返回的<var>deltaTime</var>值。
@@ -202,11 +201,11 @@ void processInput(GLFWwindow *window)
 
 ![](../img/01/09/camera_triangle.png)
 
-如果我们把斜边边长定义为1，我们就能知道邻边的长度是\(\cos \ \color{red}x/\color{purple}h = \cos \ \color{red}x/\color{purple}1 = \cos\ \color{red}x\)，它的对边是\(\sin \ \color{green}y/\color{purple}h = \sin \ \color{green}y/\color{purple}1 = \sin\ \color{green}y\)。这样我们获得了能够得到x和y方向长度的通用公式，它们取决于所给的角度。我们使用它来计算方向向量的分量：
+如果我们把斜边边长定义为1，我们就能知道邻边的长度是$$(\cos \ \color{red}x/\color{purple}h = \cos \ \color{red}x/\color{purple}1 = \cos\ \color{red}x)$$，它的对边是$$(\sin \ \color{green}y/\color{purple}h = \sin \ \color{green}y/\color{purple}1 = \sin\ \color{green}y)$$。这样我们获得了能够得到x和y方向长度的通用公式，它们取决于所给的角度。我们使用它来计算方向向量的分量：
 
 ![](../img/01/09/camera_pitch.png)
 
-这个三角形看起来和前面的三角形很像，所以如果我们想象自己在xz平面上，看向y轴，我们可以基于第一个三角形计算来计算它的长度/y方向的强度(Strength)（我们往上或往下看多少）。从图中我们可以看到对于一个给定俯仰角的y值等于\(\sin\ \theta\)：
+这个三角形看起来和前面的三角形很像，所以如果我们想象自己在xz平面上，看向y轴，我们可以基于第一个三角形计算来计算它的长度$$y$$方向的强度(Strength)（我们往上或往下看多少）。从图中我们可以看到对于一个给定俯仰角的y值等于$$(\sin\ \theta)$$：
 
 ```c++
 direction.y = sin(glm::radians(pitch)); // 注意我们先把角度转为弧度
@@ -251,7 +250,7 @@ glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 ```
 
-这里的<var>xpos</var>和<var>ypos</var>代表当前鼠标的位置。当我们用GLFW注册了回调函数之后，鼠标一移动<fun>mouse_callback</fun>函数就会被调用：
+这里的<var>xpos</var>和<var>ypos</var>代表当前鼠标的位置。当我们用GLFW注册了回调函数之后，鼠标一移动'mouse_callback'函数就会被调用：
 
 ```c++
 glfwSetCursorPosCallback(window, mouse_callback);
@@ -313,7 +312,7 @@ front.z = cos(glm::radians(pitch)) * sin(glm::radians(yaw));
 cameraFront = glm::normalize(front);
 ```
 
-计算出来的方向向量就会包含根据鼠标移动计算出来的所有旋转了。由于<var>cameraFront</var>向量已经包含在GLM的<fun>lookAt</fun>函数中，我们这就没什么问题了。
+计算出来的方向向量就会包含根据鼠标移动计算出来的所有旋转了。由于<var>cameraFront</var>向量已经包含在GLM的'lookAt'函数中，我们这就没什么问题了。
 
 如果你现在运行代码，你会发现在窗口第一次获取焦点的时候摄像机会突然跳一下。这个问题产生的原因是，在你的鼠标移动进窗口的那一刻，鼠标回调函数就会被调用，这时候的<var>xpos</var>和<var>ypos</var>会等于鼠标刚刚进入屏幕的那个位置。这通常是一个距离屏幕中心很远的地方，因而产生一个很大的偏移量，所以就会跳了。我们可以简单的使用一个`bool`变量检验我们是否是第一次获取鼠标输入，如果是，那么我们先把鼠标的初始位置更新为<var>xpos</var>和<var>ypos</var>值，这样就能解决这个问题；接下来的鼠标移动就会使用刚进入的鼠标位置坐标来计算偏移量了：
 
@@ -381,7 +380,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 }
 ```
 
-当滚动鼠标滚轮的时候，<var>yoffset</var>值代表我们竖直滚动的大小。当<fun>scroll_callback</fun>函数被调用后，我们改变全局变量<var>fov</var>变量的内容。因为`45.0f`是默认的视野值，我们将会把缩放级别(Zoom Level)限制在`1.0f`到`45.0f`。
+当滚动鼠标滚轮的时候，<var>yoffset</var>值代表我们竖直滚动的大小。当'scroll_callback'函数被调用后，我们改变全局变量<var>fov</var>变量的内容。因为`45.0f`是默认的视野值，我们将会把缩放级别(Zoom Level)限制在`1.0f`到`45.0f`。
 
 我们现在在每一帧都必须把透视投影矩阵上传到GPU，但现在使用<var>fov</var>变量作为它的视野：
 
@@ -397,14 +396,14 @@ glfwSetScrollCallback(window, scroll_callback);
 
 现在，我们就实现了一个简单的摄像机系统了，它能够让我们在3D环境中自由移动。
 
-<video src="../../img/01/09/camera_mouse.mp4" controls="controls">
+<video src="../img/01/09/camera_mouse.mp4" controls="controls">
 </video>
 
 你可以去自由地实验，如果遇到困难，可以对比[源代码](https://learnopengl.com/code_viewer_gh.php?code=src/1.getting_started/7.3.camera_mouse_zoom/camera_mouse_zoom.cpp)。
 
 !!! Important
 
-	注意，使用欧拉角的摄像机系统并不完美。根据你的视角限制或者是配置，你仍然可能引入[万向节死锁](http://en.wikipedia.org/wiki/Gimbal_lock)问题。最好的摄像机系统是使用四元数(Quaternions)的，但我们将会把这个留到后面讨论。（译注：[这里](https://github.com/cybercser/OpenGL_3_3_Tutorial_Translation/blob/master/Tutorial%2017%20Rotations.md)可以查看四元数摄像机的实现）
+> 注意，使用欧拉角的摄像机系统并不完美。根据你的视角限制或者是配置，你仍然可能引入[万向节死锁](http://en.wikipedia.org/wiki/Gimbal_lock)问题。最好的摄像机系统是使用四元数(Quaternions)的，但我们将会把这个留到后面讨论。（译注：[这里](https://github.com/cybercser/OpenGL_3_3_Tutorial_Translation/blob/master/Tutorial%2017%20Rotations.md)可以查看四元数摄像机的实现）
 
 # 摄像机类
 
@@ -414,7 +413,7 @@ glfwSetScrollCallback(window, scroll_callback);
 
 !!! Attention
 
-	我们介绍的摄像机系统是一个FPS风格的摄像机，它能够满足大多数情况需要，而且与欧拉角兼容，但是在创建不同的摄像机系统，比如飞行模拟摄像机，时就要当心。每个摄像机系统都有自己的优点和不足，所以确保对它们进行了详细研究。比如，这个FPS摄像机不允许俯仰角大于90度，而且我们使用了一个固定的上向量(0, 1, 0)，这在需要考虑滚转角的时候就不能用了。
+> 我们介绍的摄像机系统是一个FPS风格的摄像机，它能够满足大多数情况需要，而且与欧拉角兼容，但是在创建不同的摄像机系统，比如飞行模拟摄像机，时就要当心。每个摄像机系统都有自己的优点和不足，所以确保对它们进行了详细研究。比如，这个FPS摄像机不允许俯仰角大于90度，而且我们使用了一个固定的上向量(0, 1, 0)，这在需要考虑滚转角的时候就不能用了。
 
 使用新摄像机对象，更新后版本的源码可以在[这里](https://learnopengl.com/code_viewer_gh.php?code=src/1.getting_started/7.4.camera_class/camera_class.cpp)找到。
 

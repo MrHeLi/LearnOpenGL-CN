@@ -6,13 +6,13 @@
 翻译     | Krasjet, [Django](http://bullteacher.com/)
 校对     | 暂无校对
 
-OpenGL中，<def>混合</def>(Blending)通常是实现物体<def>透明度</def>(Transparency)的一种技术。透明就是说一个物体（或者其中的一部分）不是纯色(Solid Color)的，它的颜色是物体本身的颜色和它背后其它物体的颜色的不同强度结合。一个有色玻璃窗是一个透明的物体，玻璃有它自己的颜色，但它最终的颜色还包含了玻璃之后所有物体的颜色。这也是混合这一名字的出处，我们<def>混合</def>(Blend)（不同物体的）多种颜色为一种颜色。所以透明度能让我们看穿物体。
+OpenGL中，**混合**(Blending)通常是实现物体**透明度**(Transparency)的一种技术。透明就是说一个物体（或者其中的一部分）不是纯色(Solid Color)的，它的颜色是物体本身的颜色和它背后其它物体的颜色的不同强度结合。一个有色玻璃窗是一个透明的物体，玻璃有它自己的颜色，但它最终的颜色还包含了玻璃之后所有物体的颜色。这也是混合这一名字的出处，我们**混合**(Blend)（不同物体的）多种颜色为一种颜色。所以透明度能让我们看穿物体。
 
 ![](../img/04/03/blending_transparency.png)
 
-透明的物体可以是完全透明的（让所有的颜色穿过），或者是半透明的（它让颜色通过，同时也会显示自身的颜色）。一个物体的透明度是通过它颜色的<def>aplha</def>值来决定的。Alpha颜色值是颜色向量的第四个分量，你可能已经看到过它很多遍了。在这个教程之前我们都将这个第四个分量设置为1.0，让这个物体的透明度为0.0，而当alpha值为0.0时物体将会是完全透明的。当alpha值为0.5时，物体的颜色有50%是来自物体自身的颜色，50%来自背后物体的颜色。
+透明的物体可以是完全透明的（让所有的颜色穿过），或者是半透明的（它让颜色通过，同时也会显示自身的颜色）。一个物体的透明度是通过它颜色的**aplha**值来决定的。Alpha颜色值是颜色向量的第四个分量，你可能已经看到过它很多遍了。在这个教程之前我们都将这个第四个分量设置为1.0，让这个物体的透明度为0.0，而当alpha值为0.0时物体将会是完全透明的。当alpha值为0.5时，物体的颜色有50%是来自物体自身的颜色，50%来自背后物体的颜色。
 
-我们目前一直使用的纹理有三个颜色分量：红、绿、蓝。但一些材质会有一个内嵌的alpha通道，对每个纹素(Texel)都包含了一个<def>alpha</def>值。这个alpha值精确地告诉我们纹理各个部分的透明度。比如说，下面这个[窗户纹理](../img/04/03/blending_transparent_window.png)中的玻璃部分的alpha值为0.25（它在一般情况下是完全的红色，但由于它有75%的透明度，能让很大一部分的网站背景颜色穿过，让它看起来不那么红了），边框的alpha值是0.0。
+我们目前一直使用的纹理有三个颜色分量：红、绿、蓝。但一些材质会有一个内嵌的alpha通道，对每个纹素(Texel)都包含了一个**alpha**值。这个alpha值精确地告诉我们纹理各个部分的透明度。比如说，下面这个[窗户纹理](../img/04/03/blending_transparent_window.png)中的玻璃部分的alpha值为0.25（它在一般情况下是完全的红色，但由于它有75%的透明度，能让很大一部分的网站背景颜色穿过，让它看起来不那么红了），边框的alpha值是0.0。
 
 ![](../img/04/03/blending_transparent_window.png)
 
@@ -26,7 +26,7 @@ OpenGL中，<def>混合</def>(Blending)通常是实现物体<def>透明度</def>
 
 ![](../img/04/03/grass.png)
 
-所以当添加像草这样的植被到场景中时，我们不希望看到草的方形图像，而是只显示草的部分，并能看透图像其余的部分。我们想要<def>丢弃</def>(Discard)显示纹理中透明部分的片段，不将这些片段存储到颜色缓冲中。在此之前，我们还要学习如何加载一个透明的纹理。
+所以当添加像草这样的植被到场景中时，我们不希望看到草的方形图像，而是只显示草的部分，并能看透图像其余的部分。我们想要**丢弃**(Discard)显示纹理中透明部分的片段，不将这些片段存储到颜色缓冲中。在此之前，我们还要学习如何加载一个透明的纹理。
 
 要想加载有alpha值的纹理，我们并不需要改很多东西，`stb_image`在纹理有alpha通道的时候会自动加载，但我们仍要在纹理生成过程中告诉OpenGL，我们的纹理现在使用alpha通道了：
 
@@ -103,16 +103,16 @@ void main()
 
 !!! Important
 
-	注意，当采样纹理的边缘的时候，OpenGL会对边缘的值和纹理下一个重复的值进行插值（因为我们将它的环绕方式设置为了<var>GL_REPEAT</var>。这通常是没问题的，但是由于我们使用了透明值，纹理图像的顶部将会与底部边缘的纯色值进行插值。这样的结果是一个半透明的有色边框，你可能会看见它环绕着你的纹理四边形。要想避免这个，每当你alpha纹理的时候，请将纹理的环绕方式设置为<var>GL_CLAMP_TO_EDGE</var>：
-
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+> 注意，当采样纹理的边缘的时候，OpenGL会对边缘的值和纹理下一个重复的值进行插值（因为我们将它的环绕方式设置为了<var>GL_REPEAT</var>。这通常是没问题的，但是由于我们使用了透明值，纹理图像的顶部将会与底部边缘的纯色值进行插值。这样的结果是一个半透明的有色边框，你可能会看见它环绕着你的纹理四边形。要想避免这个，每当你alpha纹理的时候，请将纹理的环绕方式设置为<var>GL_CLAMP_TO_EDGE</var>：
+>
+> 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+> 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 你可以在[这里](https://learnopengl.com/code_viewer_gh.php?code=src/4.advanced_opengl/3.1.blending_discard/blending_discard.cpp)找到源码。
 
 ## 混合
 
-虽然直接丢弃片段很好，但它不能让我们渲染半透明的图像。我们要么渲染一个片段，要么完全丢弃它。要想渲染有多个透明度级别的图像，我们需要启用<def>混合</def>(Blending)。和OpenGL大多数的功能一样，我们可以启用<var>GL_BLEND</var>来启用混合：
+虽然直接丢弃片段很好，但它不能让我们渲染半透明的图像。我们要么渲染一个片段，要么完全丢弃它。要想渲染有多个透明度级别的图像，我们需要启用**混合**(Blending)。和OpenGL大多数的功能一样，我们可以启用<var>GL_BLEND</var>来启用混合：
 
 ```c++
 glEnable(GL_BLEND);
@@ -126,18 +126,18 @@ $$
 \begin{equation}\bar{C}_{result} = \bar{\color{green}C}_{source} * \color{green}F_{source} + \bar{\color{red}C}_{destination} * \color{red}F_{destination}\end{equation}
 $$
 
-- \(\bar{\color{green}C}_{source}\)：源颜色向量。这是源自纹理的颜色向量。
-- \(\bar{\color{red}C}_{destination}\)：目标颜色向量。这是当前储存在颜色缓冲中的颜色向量。
-- \(\color{green}F_{source}\)：源因子值。指定了alpha值对源颜色的影响。
-- \(\color{red}F_{destination}\)：目标因子值。指定了alpha值对目标颜色的影响。
+- $$(\bar{\color{green}C}_{source})$$：源颜色向量。这是源自纹理的颜色向量。
+- $$(\bar{\color{red}C}_{destination})$$：目标颜色向量。这是当前储存在颜色缓冲中的颜色向量。
+- $$(\color{green}F_{source})$$：源因子值。指定了alpha值对源颜色的影响。
+- $$(\color{red}F_{destination})$$：目标因子值。指定了alpha值对目标颜色的影响。
 
-片段着色器运行完成后，并且所有的测试都通过之后，这个<def>混合方程</def>(Blend Equation)才会应用到片段颜色输出与当前颜色缓冲中的值（当前片段之前储存的之前片段的颜色）上。源颜色和目标颜色将会由OpenGL自动设定，但源因子和目标因子的值可以由我们来决定。我们先来看一个简单的例子：
+片段着色器运行完成后，并且所有的测试都通过之后，这个**混合方程**(Blend Equation)才会应用到片段颜色输出与当前颜色缓冲中的值（当前片段之前储存的之前片段的颜色）上。源颜色和目标颜色将会由OpenGL自动设定，但源因子和目标因子的值可以由我们来决定。我们先来看一个简单的例子：
 
 ![](../img/04/03/blending_equation.png)
 
 我们有两个方形，我们希望将这个半透明的绿色方形绘制在红色方形之上。红色的方形将会是目标颜色（所以它应该先在颜色缓冲中），我们将要在这个红色方形之上绘制这个绿色方形。
 
-问题来了：我们将因子值设置为什么？嘛，我们至少想让绿色方形乘以它的alpha值，所以我们想要将\(F_{src}\)设置为源颜色向量的alpha值，也就是0.6。接下来就应该清楚了，目标方形的贡献应该为剩下的alpha值。如果绿色方形对最终颜色贡献了60%，那么红色方块应该对最终颜色贡献了40%，即`1.0 - 0.6`。所以我们将\(F_{destination}\)设置为1减去源颜色向量的alpha值。这个方程变成了：
+问题来了：我们将因子值设置为什么？嘛，我们至少想让绿色方形乘以它的alpha值，所以我们想要将$$(F_{src})$$设置为源颜色向量的alpha值，也就是0.6。接下来就应该清楚了，目标方形的贡献应该为剩下的alpha值。如果绿色方形对最终颜色贡献了60%，那么红色方块应该对最终颜色贡献了40%，即`1.0 - 0.6`。所以我们将$$(F_{destination})$$设置为1减去源颜色向量的alpha值。这个方程变成了：
 
 $$
 \begin{equation}\bar{C}_{result} = \begin{pmatrix} \color{red}{0.0} \\ \color{green}{1.0} \\ \color{blue}{0.0} \\ \color{purple}{0.6} \end{pmatrix} * \color{green}{0.6} + \begin{pmatrix} \color{red}{1.0} \\ \color{green}{0.0} \\ \color{blue}{0.0} \\ \color{purple}{1.0} \end{pmatrix} * \color{red}{(1 - 0.6)} \end{equation}
@@ -149,34 +149,34 @@ $$
 
 最终的颜色将会被储存到颜色缓冲中，替代之前的颜色。
 
-这样子很不错，但我们该如何让OpenGL使用这样的因子呢？正好有一个专门的函数，叫做<fun>glBlendFunc</fun>。
+这样子很不错，但我们该如何让OpenGL使用这样的因子呢？正好有一个专门的函数，叫做`glBlendFunc`。
 
-<fun>glBlendFunc(GLenum sfactor, GLenum dfactor)</fun>函数接受两个参数，来设置<def>源</def>和<def>目标因子</def>。OpenGL为我们定义了很多个选项，我们将在下面列出大部分最常用的选项。注意常数颜色向量\(\bar{\color{blue}C}_{constant}\)可以通过<fun>glBlendColor</fun>函数来另外设置。
+`glBlendFunc(GLenum sfactor, GLenum dfactor)`函数接受两个参数，来设置**源**和**目标因子**。OpenGL为我们定义了很多个选项，我们将在下面列出大部分最常用的选项。注意常数颜色向量$$(\bar{\color{blue}C}_{constant})$$可以通过`glBlendColor`函数来另外设置。
 
 选项 |	值
 ---|---
 `GL_ZERO`  |	因子等于\(0\)
 `GL_ONE`	 |  因子等于\(1\)
-`GL_SRC_COLOR` |	因子等于源颜色向量\(\bar{\color{green}C}_{source}\)
-`GL_ONE_MINUS_SRC_COLOR` | 因子等于\(1 - \bar{\color{green}C}_{source}\)
-`GL_DST_COLOR` |	 因子等于目标颜色向量\(\bar{\color{red}C}_{destination}\)
-`GL_ONE_MINUS_DST_COLOR` | 因子等于\(1 - \bar{\color{red}C}_{destination}\)
-`GL_SRC_ALPHA` |	因子等于\(\bar{\color{green}C}_{source}\)的\(alpha\)分量
-`GL_ONE_MINUS_SRC_ALPHA` | 因子等于\(1 -\) \(\bar{\color{green}C}_{source}\)的\(alpha\)分量
-`GL_DST_ALPHA` |	因子等于\(\bar{\color{red}C}_{destination}\)的\(alpha\)分量
-`GL_ONE_MINUS_DST_ALPHA` | 因子等于\(1 -\) \(\bar{\color{red}C}_{destination}\)的\(alpha\)分量
-`GL_CONSTANT_COLOR`	   | 因子等于常数颜色向量\(\bar{\color{blue}C}_{constant}\)
-`GL_ONE_MINUS_CONSTANT_COLOR` |	因子等于\(1 - \bar{\color{blue}C}_{constant}\)
-`GL_CONSTANT_ALPHA`	   | 因子等于\(\bar{\color{blue}C}_{constant}\)的\(alpha\)分量
-`GL_ONE_MINUS_CONSTANT_ALPHA` |	因子等于\(1 -\) \(\bar{\color{blue}C}_{constant}\)的\(alpha\)分量
+`GL_SRC_COLOR` | 因子等于源颜色向量$$(\bar{\color{green}C}_{source})$$ 
+`GL_ONE_MINUS_SRC_COLOR` | 因子等于$$(1 - \bar{\color{green}C}_{source})$$ 
+`GL_DST_COLOR` | 因子等于目标颜色向量$$(\bar{\color{red}C}_{destination})$$ 
+`GL_ONE_MINUS_DST_COLOR` | 因子等于$$(1 - \bar{\color{red}C}_{destination})$$ 
+`GL_SRC_ALPHA` | 因子等于$$(\bar{\color{green}C}_{source})$$的$$(alpha)$$分量 
+`GL_ONE_MINUS_SRC_ALPHA` | 因子等于$$(1 -)$$ $$(\bar{\color{green}C}_{source})$$的$$(alpha)$$分量 
+`GL_DST_ALPHA` | 因子等于$$(\bar{\color{red}C}_{destination})$$的$$(alpha)$$分量 
+`GL_ONE_MINUS_DST_ALPHA` | 因子等于$$(1 -)$$ $$(\bar{\color{red}C}_{destination})$$的$$(alpha)$$分量 
+`GL_CONSTANT_COLOR`	   | 因子等于常数颜色向量$$(\bar{\color{blue}C}_{constant})$$ 
+`GL_ONE_MINUS_CONSTANT_COLOR` | 因子等于$$(1 - \bar{\color{blue}C}_{constant})$$ 
+`GL_CONSTANT_ALPHA`	   | 因子等于$$(\bar{\color{blue}C}_{constant})$$的$$(alpha)$$分量 
+`GL_ONE_MINUS_CONSTANT_ALPHA` | 因子等于$$(1 -)$$ $$(\bar{\color{blue}C}_{constant})$$的$$(alpha)$$分量 
 
-为了获得之前两个方形的混合结果，我们需要使用源颜色向量的\(alpha\)作为源因子，使用\(1 - alpha\)作为目标因子。这将会产生以下的<fun>glBlendFunc</fun>：
+为了获得之前两个方形的混合结果，我们需要使用源颜色向量的\(alpha\)作为源因子，使用\(1 - alpha\)作为目标因子。这将会产生以下的`glBlendFunc`：
 
 ```c++
 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 ```
 
-也可以使用<fun>glBlendFuncSeparate</fun>为RGB和alpha通道分别设置不同的选项：
+也可以使用`glBlendFuncSeparate`为RGB和alpha通道分别设置不同的选项：
 
 ```c++
 glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
@@ -184,13 +184,13 @@ glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
 
 这个函数和我们之前设置的那样设置了RGB分量，但这样只能让最终的alpha分量被源颜色向量的alpha值所影响到。
 
-OpenGL甚至给了我们更多的灵活性，允许我们改变方程中源和目标部分的运算符。当前源和目标是相加的，但如果愿意的话，我们也可以让它们相减。<fun>glBlendEquation(GLenum mode)</fun>允许我们设置运算符，它提供了三个选项：
+OpenGL甚至给了我们更多的灵活性，允许我们改变方程中源和目标部分的运算符。当前源和目标是相加的，但如果愿意的话，我们也可以让它们相减。`glBlendEquation(GLenum mode)`允许我们设置运算符，它提供了三个选项：
 
-- GL_FUNC_ADD：默认选项，将两个分量相加：\(\bar{C}_{result} = \color{green}{Src} + \color{red}{Dst}\)。
-- GL_FUNC_SUBTRACT：将两个分量相减： \(\bar{C}_{result} = \color{green}{Src} - \color{red}{Dst}\)。
-- GL_FUNC_REVERSE_SUBTRACT：将两个分量相减，但顺序相反：\(\bar{C}_{result} = \color{red}{Dst} - \color{green}{Src}\)。
+- GL_FUNC_ADD：默认选项，将两个分量相加：$$(\bar{C}_{result} = \color{green}{Src} + \color{red}{Dst})$$。
+- GL_FUNC_SUBTRACT：将两个分量相减： $$(\bar{C}_{result} = \color{green}{Src} - \color{red}{Dst})$$。
+- GL_FUNC_REVERSE_SUBTRACT：将两个分量相减，但顺序相反：$$(\bar{C}_{result} = \color{red}{Dst} - \color{green}{Src})$$。
 
-通常我们都可以省略调用<fun>glBlendEquation</fun>，因为<var>GL_FUNC_ADD</var>对大部分的操作来说都是我们希望的混合方程，但如果你真的想打破主流，其它的方程也可能符合你的要求。
+通常我们都可以省略调用`glBlendEquation`，因为<var>GL_FUNC_ADD</var>对大部分的操作来说都是我们希望的混合方程，但如果你真的想打破主流，其它的方程也可能符合你的要求。
 
 ## 渲染半透明纹理
 
@@ -231,7 +231,7 @@ void main()
 
 !!! Important
 
-	注意，对于草这种全透明的物体，我们可以选择丢弃透明的片段而不是混合它们，这样就解决了这些头疼的问题（没有深度问题）。
+> 注意，对于草这种全透明的物体，我们可以选择丢弃透明的片段而不是混合它们，这样就解决了这些头疼的问题（没有深度问题）。
 
 ## 不要打乱顺序
 
@@ -241,7 +241,7 @@ void main()
 2. 对所有透明的物体排序。
 3. 按顺序绘制所有透明的物体。
 
-排序透明物体的一种方法是，从观察者视角获取物体的距离。这可以通过计算摄像机位置向量和物体的位置向量之间的距离所获得。接下来我们把距离和它对应的位置向量存储到一个STL库的<fun>map</fun>数据结构中。<fun>map</fun>会自动根据键值(Key)对它的值排序，所以只要我们添加了所有的位置，并以它的距离作为键，它们就会自动根据距离值排序了。
+排序透明物体的一种方法是，从观察者视角获取物体的距离。这可以通过计算摄像机位置向量和物体的位置向量之间的距离所获得。接下来我们把距离和它对应的位置向量存储到一个STL库的`map`数据结构中。`map`会自动根据键值(Key)对它的值排序，所以只要我们添加了所有的位置，并以它的距离作为键，它们就会自动根据距离值排序了。
 
 ```c++
 std::map<float, glm::vec3> sorted;
@@ -266,7 +266,7 @@ for(std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sort
 }
 ```
 
-我们使用了<fun>map</fun>的一个反向迭代器(Reverse Iterator)，反向遍历其中的条目，并将每个窗户四边形位移到对应的窗户位置上。这是排序透明物体的一个比较简单的实现，它能够修复之前的问题，现在场景看起来是这样的：
+我们使用了`map`的一个反向迭代器(Reverse Iterator)，反向遍历其中的条目，并将每个窗户四边形位移到对应的窗户位置上。这是排序透明物体的一个比较简单的实现，它能够修复之前的问题，现在场景看起来是这样的：
 
 ![](../img/04/03/blending_sorted.png)
 
@@ -274,4 +274,4 @@ for(std::map<float,glm::vec3>::reverse_iterator it = sorted.rbegin(); it != sort
 
 虽然按照距离排序物体这种方法对我们这个场景能够正常工作，但它并没有考虑旋转、缩放或者其它的变换，奇怪形状的物体需要一个不同的计量，而不是仅仅一个位置向量。
 
-在场景中排序物体是一个很困难的技术，很大程度上由你场景的类型所决定，更别说它额外需要消耗的处理能力了。完整渲染一个包含不透明和透明物体的场景并不是那么容易。更高级的技术还有<def>次序无关透明度</def>(Order Independent Transparency, OIT)，但这超出本教程的范围了。现在，你还是必须要普通地混合你的物体，但如果你很小心，并且知道目前方法的限制的话，你仍然能够获得一个比较不错的混合实现。
+在场景中排序物体是一个很困难的技术，很大程度上由你场景的类型所决定，更别说它额外需要消耗的处理能力了。完整渲染一个包含不透明和透明物体的场景并不是那么容易。更高级的技术还有**次序无关透明度**(Order Independent Transparency, OIT)，但这超出本教程的范围了。现在，你还是必须要普通地混合你的物体，但如果你很小心，并且知道目前方法的限制的话，你仍然能够获得一个比较不错的混合实现。
